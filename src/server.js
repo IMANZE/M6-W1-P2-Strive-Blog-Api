@@ -3,7 +3,12 @@ import mongoose from "mongoose";
 import cors from "cors";
 import listEndpoints from "express-list-endpoints";
 import authorsRouter from "./apis/authors/index.js";
-import {badRequestHandler,unAuthorizedHandler,notFoundHandler,genericErrorHandler} from "./errorHandlers.js"
+import {
+  badRequestHandler,
+  unAuthorizedHandler,
+  notFoundHandler,
+  genericErrorHandler,
+} from "./errorHandlers.js";
 import blogRouter from "./apis/blogs/index.js";
 
 const server = express();
@@ -13,16 +18,15 @@ const port = process.env.PORT || 3002;
 server.use(express.json());
 // server.use(cors());
 
-
 //ROUTES
-server.use("/authors", authorsRouter)
-server.use("/blogs", blogRouter)
+server.use("/authors", authorsRouter);
+server.use("/blogs", blogRouter);
 
 //ERROR HANDLER
-server.use( badRequestHandler)
-server.use( unAuthorizedHandler)
-server.use(notFoundHandler)
-server.use( genericErrorHandler)
+server.use(badRequestHandler);
+server.use(unAuthorizedHandler);
+server.use(notFoundHandler);
+server.use(genericErrorHandler);
 
 mongoose.connect(process.env.MONGO_CONNECTION_URL);
 
@@ -33,6 +37,6 @@ mongoose.connection.on("connected", () => {
     console.log(`server is running on port ${port}`);
   });
 });
-server.on("error", (err)=>{
-    console.log("MAIN ERROR", err);
-})
+server.on("error", (err) => {
+  console.log("MAIN ERROR", err);
+});
