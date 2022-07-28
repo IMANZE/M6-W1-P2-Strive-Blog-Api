@@ -16,7 +16,10 @@ blogRouter.post("/", async (req, res, next) => {
 
 blogRouter.get("/", async (req, res, next) => {
   try {
-    const blogs = await blogModel.find().populate({
+
+    let limit = 2;
+    let skip = req.query.page ? (parseInt(req.query.page) - 1) * 2:0 //page 1, 1-1 0*2, 0 page 2 2-1 1*2 2, page 3 3-1 2*2 4
+    const blogs = await blogModel.find().skip(skip).limit(limit).populate({ // find({title:req.query.title})
       path: "author",
       select: "firstName lastName avatar",
     });
