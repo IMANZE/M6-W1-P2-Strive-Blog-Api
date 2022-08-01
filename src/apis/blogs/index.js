@@ -97,17 +97,43 @@ blogRouter.post("/comment/:blogId", async (req, res, next) => {
 });
 
 blogRouter.get("/comment/:blogId", async (req, res, next) => {
-    try {
-      const { blogId } = req.params;
-      const blog = await blogModel.findById(blogId)
-      if (blog) {
-        res.send(blog);
-      } else {
-        next(createError(404, `blog with the id ${req.params.blogId} not found`));
-      }
-    } catch (error) {
-      next(error);
+  try {
+    const { blogId } = req.params;
+    const blog = await blogModel.findById(blogId);
+    if (blog) {
+      res.send(blog);
+    } else {
+      next(createError(404, `blog with the id ${req.params.blogId} not found`));
     }
-  });
+  } catch (error) {
+    next(error);
+  }
+});
+
+blogRouter.get("/:blogId/comment/:commentId", async (req, res, next) => {
+  try {
+    const { blogId, commentId } = req.params;
+    const blog = await blogModel.findById(blogId);
+    if (blog) {
+      const getComment = blog.comment.find(
+        (uniqueComment) => uniqueComment._id.toString() === commentId
+      );
+      if (getComment) {
+        res.send(getComment);
+      } else {
+        next(
+          createError(
+            404,
+            `Comment with the id ${req.params.commentId} not found`
+          )
+        );
+      }
+    } else {
+      next(createError(404, `blog with the id ${req.params.blogId} not found`));
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default blogRouter;

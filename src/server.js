@@ -12,7 +12,7 @@ import {
 import blogRouter from "./apis/blogs/index.js";
 
 const server = express();
-const port = process.env.PORT || 3002;
+const port = 3005;
 
 // MIDDLEWARES
 server.use(express.json());
