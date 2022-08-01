@@ -13,6 +13,7 @@ const blogSchema = new Schema(
     },
     author: [{ type: Schema.Types.ObjectId, ref: "Author" }],
     content: { type: String, required: true },
+    comment:[{comment: String, commentDate: Date}]
   },
   { timestamps: true }
 );

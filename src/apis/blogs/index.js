@@ -16,10 +16,10 @@ blogRouter.post("/", async (req, res, next) => {
 
 blogRouter.get("/", async (req, res, next) => {
   try {
-
     let limit = 2;
-    let skip = req.query.page ? (parseInt(req.query.page) - 1) * 2:0 //page 1, 1-1 0*2, 0 page 2 2-1 1*2 2, page 3 3-1 2*2 4
-    const blogs = await blogModel.find().skip(skip).limit(limit).populate({ // find({title:req.query.title})
+    let skip = req.query.page ? (parseInt(req.query.page) - 1) * 2 : 0; //page 1, 1-1 0*2, 0 page 2 2-1 1*2 2, page 3 3-1 2*2 4
+    const blogs = await blogModel.find().skip(skip).limit(limit).populate({
+      // find({title:req.query.title})
       path: "author",
       select: "firstName lastName avatar",
     });
@@ -75,5 +75,26 @@ blogRouter.delete("/:blogId", async (req, res, next) => {
     next(error);
   }
 });
+
+blogRouter.post("/comment/:blogId", async (req, res, next) => {
+  try {
+    const newComment = await blogModel.findByIdAndUpdate(
+      req.params.blogId,
+      {
+        $push: { comment: { ...req.body, commentDate: new Date() } },
+      },
+      { new: true }
+    );
+    console.log(newComment);
+    if (newComment) {
+      res.send(newComment);
+    } else {
+      next(createError(404, `blog with the id ${req.params.blogId} not found`));
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 export default blogRouter;
