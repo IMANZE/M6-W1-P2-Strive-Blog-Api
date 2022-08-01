@@ -96,5 +96,18 @@ blogRouter.post("/comment/:blogId", async (req, res, next) => {
   }
 });
 
+blogRouter.get("/comment/:blogId", async (req, res, next) => {
+    try {
+      const { blogId } = req.params;
+      const blog = await blogModel.findById(blogId)
+      if (blog) {
+        res.send(blog);
+      } else {
+        next(createError(404, `blog with the id ${req.params.blogId} not found`));
+      }
+    } catch (error) {
+      next(error);
+    }
+  });
 
 export default blogRouter;
