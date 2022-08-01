@@ -140,20 +140,40 @@ blogRouter.put("/:blogId/comment/:commentId", async (req, res, next) => {
   try {
     const commentUpdate = await blogModel.findById(req.params.blogId);
     if (commentUpdate) {
-        const putComment = commentUpdate.comment.findIndex(
-          (uniqueComment) => uniqueComment._id.toString() === req.params.commentId
-        );
-        //-1 =  It does not exist 
-        if (putComment !== -1) {
-            const oldComment = commentUpdate.comment[putComment].toObject()
+      const putComment = commentUpdate.comment.findIndex(
+        (uniqueComment) => uniqueComment._id.toString() === req.params.commentId
+      );
+      //-1 =  It does not exist
+      if (putComment !== -1) {
+        const oldComment = commentUpdate.comment[putComment].toObject();
 
-            commentUpdate.comment[putComment] = {...oldComment, ...req.body}
-            await commentUpdate.save()
-            res.send(commentUpdate)
-        } else {
-            next(createError(404, `blog with the id ${req.params.blogId} not found`));
-        } 
-        
+        commentUpdate.comment[putComment] = { ...oldComment, ...req.body };
+        await commentUpdate.save();
+        res.send(commentUpdate);
+      } else {
+        next(
+          createError(404, `blog with the id ${req.params.blogId} not found`)
+        );
+      }
+    } else {
+      next(createError(404, `blog with the id ${req.params.blogId} not found`));
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+blogRouter.delete("/:blogId/comment/:commentId", async (req, res, next) => {
+  try {
+    const deletedComment = await blogModel.findByIdAndUpdate(
+      req.params.blogId,
+      {
+        $pull: { comment: { _id: req.params.commentId } },
+      },
+      { new: true }
+    );
+    if (deletedComment) {
+      res.send(deletedComment);
     } else {
       next(createError(404, `blog with the id ${req.params.blogId} not found`));
     }
