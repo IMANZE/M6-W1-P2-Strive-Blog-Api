@@ -136,4 +136,30 @@ blogRouter.get("/:blogId/comment/:commentId", async (req, res, next) => {
   }
 });
 
+blogRouter.put("/:blogId/comment/:commentId", async (req, res, next) => {
+  try {
+    const commentUpdate = await blogModel.findById(req.params.blogId);
+    if (commentUpdate) {
+        const putComment = commentUpdate.comment.findIndex(
+          (uniqueComment) => uniqueComment._id.toString() === req.params.commentId
+        );
+        //-1 =  It does not exist 
+        if (putComment !== -1) {
+            const oldComment = commentUpdate.comment[putComment].toObject()
+
+            commentUpdate.comment[putComment] = {...oldComment, ...req.body}
+            await commentUpdate.save()
+            res.send(commentUpdate)
+        } else {
+            next(createError(404, `blog with the id ${req.params.blogId} not found`));
+        } 
+        
+    } else {
+      next(createError(404, `blog with the id ${req.params.blogId} not found`));
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default blogRouter;
