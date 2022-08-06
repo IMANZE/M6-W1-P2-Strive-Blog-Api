@@ -16,7 +16,7 @@ const port = 3005;
 
 // MIDDLEWARES
 server.use(express.json());
-// server.use(cors());
+server.use(cors());
 
 //ROUTES
 server.use("/authors", authorsRouter);
@@ -37,6 +37,6 @@ mongoose.connection.on("connected", () => {
     console.log(`server is running on port ${port}`);
   });
 });
-server.on("error", (err) => {
-  console.log("MAIN ERROR", err);
-});
+// server.on("error", (err) => {
+//   console.log("MAIN ERROR", err);
+// });
