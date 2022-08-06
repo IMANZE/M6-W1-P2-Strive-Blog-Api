@@ -1,18 +1,32 @@
 import express from "express";
 import createError from "http-errors";
 import blogModel from "./model.js";
+import { cloudinarySendData } from "../../lib/cloudinary.js";
 
 const blogRouter = express.Router();
 
-blogRouter.post("/", async (req, res, next) => {
+blogRouter.post("/", async (req,res,next) => {
+  console.log("REQUEST BODY: ", req.body);
   try {
-    const blog = new blogModel(req.body);
-    const { _id } = await blog.save();
-    res.status(201).send({ _id });
+    const newBlog = await new blogModel(req.body);
+    const savedBlog = await newBlog.save()
+    res.send(savedBlog)
   } catch (error) {
-    next(error);
+    console.log(error)
+    next(error)
   }
-});
+})
+
+
+// blogRouter.post("/", async (req, res, next) => {
+//   try {
+//     const blog = new blogModel(req.body);
+//     const { _id } = await blog.save();
+//     res.status(201).send({ _id });
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 blogRouter.get("/", async (req, res, next) => {
   try {
@@ -181,5 +195,26 @@ blogRouter.delete("/:blogId/comment/:commentId", async (req, res, next) => {
     next(error);
   }
 });
+
+blogRouter.post("/:blogId/avatar", cloudinarySendData, async (req, res, next) => {
+  try {
+   console.log(req.file.path); 
+  const blogAvatar = await blogModel.findByIdAndUpdate(
+    req.params.blogId, 
+    {
+      cover:req.file.path
+    },
+    {
+      new: true
+    }
+  )
+  if (blogAvatar){
+    res.send(blogAvatar)
+  }
+  } catch (error) {
+   console.log(error);
+   next(error)
+  }
+})
 
 export default blogRouter;
