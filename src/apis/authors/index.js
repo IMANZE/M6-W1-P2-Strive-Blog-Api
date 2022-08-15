@@ -1,14 +1,16 @@
 import express from "express";
 import createError from "http-errors";
+import { cloudinaryAuthor } from "../../lib/cloudinary.js";
 import AuthorsModel from "./model.js";
 
 const authorsRouter = express.Router();
 
 authorsRouter.post("/", async (req, res, next) => {
   try {
+    console.log(req.body);
     const author = new AuthorsModel(req.body);
-    const { _id } = await author.save();
-    res.status(201).send({ _id });
+    const newAuthor = await author.save();
+    res.send(newAuthor);
   } catch (error) {
     next(error);
   }
@@ -74,5 +76,31 @@ authorsRouter.delete("/:authorId", async (req, res, next) => {
     next(error);
   }
 });
+
+authorsRouter.post(
+  "/:authorId/avatar",
+  cloudinaryAuthor,
+  async (req, res, next) => {
+    try {
+      console.log(req.file.path);
+      const authorAvatar = await AuthorsModel.findByIdAndUpdate(
+        req.params.authorId,
+        {
+          avatar: req.file.path,
+        },
+        {
+          new: true,
+        }
+      );
+      console.log(authorAvatar);
+      if (authorAvatar) {
+        res.send(authorAvatar);
+      }
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+);
 
 export default authorsRouter;
