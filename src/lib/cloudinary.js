@@ -19,3 +19,21 @@ export const cloudinarySendData = multer({
     }
   },
 }).single("cover");
+
+export const cloudinaryAuthor = multer({
+    storage: new CloudinaryStorage({
+      cloudinary,
+      params: {
+        folder: "author /avatar",
+      },
+    }),
+    limits: { fileSize: 1 * 1024 * 1024 },
+    fileFilter: (req, file, next) => {
+      if (file.mimetype !== "image/jpeg") {
+        return next(createError(400, "only images allowed"));
+      } else {
+        next(null, true);
+      }
+    },
+  }).single("avatar");
+  
