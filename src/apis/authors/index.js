@@ -1,6 +1,7 @@
 import express from "express";
 import createError from "http-errors";
 import { cloudinaryAuthor } from "../../lib/cloudinary.js";
+import { generateJWTToken } from "../../lib/tools.js";
 import AuthorsModel from "./model.js";
 
 const authorsRouter = express.Router();
@@ -102,5 +103,25 @@ authorsRouter.post(
     }
   }
 );
+
+authorsRouter.post('/login', async (req,res,next) => {
+  try {
+    const {email, password } = req.body;
+
+    const author = await AuthorsModel.checkCredentials(email, password);
+
+    if (author) {
+      const token = await generateJWTToken({
+        _id: author._id,
+        email: author.email
+      })
+      res.send({accessToken: token});
+    } else {
+      next(createError(401, "Credentials are not valid!"))
+    }
+  } catch (error) {
+    next(error)
+  }
+})
 
 export default authorsRouter;
